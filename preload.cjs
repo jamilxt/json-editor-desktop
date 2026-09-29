@@ -7,5 +7,8 @@ contextBridge.exposeInMainWorld('desktop', {
   confirm: (message, buttons, title) => ipcRenderer.invoke('dialog:confirm', { message, buttons, title }),
   loadSettings: () => ipcRenderer.invoke('settings:load'),
   saveSettings: (s) => ipcRenderer.invoke('settings:save', s),
+  openExternal: (url) => ipcRenderer.invoke('shell:openExternal', url),
+  appInfo: () => ipcRenderer.invoke('app:info'),
+  setDirty: (dirty) => ipcRenderer.send('dirty-state', !!dirty),
   onMenu: (cb) => ipcRenderer.on('menu', (evt, action) => cb(action))
 })

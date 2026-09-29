@@ -21,6 +21,7 @@
   let leftMode = 'tree'
   let rightMode = 'tree'
   let leftFilePath = null
+  let leftDirty = false
   let rightFilePath = null
   let leftSchema = null
   let rightSchema = null
@@ -28,7 +29,8 @@
   /* ---------- app state ---------- */
 
   let darkMode = false
-  let modal = null // null | { kind: 'transform' | 'schema' | 'curl', target: 'left' | 'right' }
+  let modal = null // null | { kind: 'transform' | 'schema' | 'curl' | 'about', target: 'left' | 'right' }
+  let appVersion = ''
   let compareRows = null // null | array of diffs
   let recentFiles = []
   let statusMsg = ''
@@ -52,7 +54,17 @@
       recentFiles = s.recentFiles || []
       window.desktop.onMenu(async (action) => {
         if (action === 'open-file') await openInto('left')
+        if (action === 'about') showAbout()
+        if (action === 'save-and-quit') {
+          await saveSide('left')
+          // after save, dirty is false -> the pending close proceeds
+          window.desktop.setDirty(false)
+          window.close()
+        }
       })
+      if (window.desktop.appInfo) {
+        window.desktop.appInfo().then((i) => { appVersion = i.version }).catch(() => {})
+      }
     }
     applyTheme()
   })
@@ -66,6 +78,12 @@
   function applyTheme () {
     document.documentElement.classList.toggle('dark-mode', darkMode)
   }
+
+  /* ---------- window title: filename + dirty dot ---------- */
+
+  $: baseTitle = leftFilePath ? leftFilePath.split(/[\\/]/).pop() : 'untitled'
+  $: document.title = (leftDirty ? '\u25cf ' : '') + baseTitle + ' - JSON Editor'
+  $: if (window.desktop.setDirty) window.desktop.setDirty(leftDirty)
 
   function toggleDark () {
     darkMode = !darkMode
@@ -131,6 +149,7 @@
     if (side === 'left') {
       leftContent = content
       leftFilePath = filePath || null
+      leftDirty = false
       leftMode = 'tree'
       leftSchema = null
     } else {
@@ -192,7 +211,7 @@
 
     const savedPath = await window.desktop.saveFile(outText, defaultName)
     if (savedPath) {
-      if (side === 'left') leftFilePath = savedPath
+      if (side === 'left') { leftFilePath = savedPath; leftDirty = false }
       else rightFilePath = savedPath
       addRecent(savedPath)
       status('Saved: ' + savedPath)
@@ -282,6 +301,18 @@
 
   function openCurl () {
     modal = { kind: 'curl', target: 'left' }
+  }
+
+  /* ---------- about / github ---------- */
+
+  const REPO_URL = 'https://github.com/jamilxt/json-editor-desktop'
+
+  function openGitHub () {
+    window.desktop.openExternal(REPO_URL)
+  }
+
+  function showAbout () {
+    modal = { kind: 'about' }
   }
 
   /* ---------- path navigator ---------- */
@@ -444,12 +475,16 @@
     <span class="toolbar-sep"></span>
     <button class="appbtn" title="Compare left and right documents" on:click={runCompare}>Compare</button>
     <span class="spacer"></span>
+    <button class="appbtn" title="Star or fork the project on GitHub" on:click={openGitHub}>GitHub</button>
+    <button class="appbtn" title="About this app" on:click={showAbout}>About</button>
     <button class="appbtn" title="Toggle dark mode (Ctrl+D)" on:click={toggleDark}>{darkMode ? 'Light mode' : 'Dark mode'}</button>
   </div>
 
   <div class="panels">
     <section
-      class="panel"
+      class="panel editor-container"
+      class:jse-theme-dark={darkMode}
+      class:dark-editor={darkMode}
       bind:this={leftHolder}
       aria-label="Left editor"
       on:dragover={handleDragOver}
@@ -487,6 +522,7 @@
           statusBar={false}
           on:change={(e) => {
             leftContent = e.detail.content
+            leftDirty = true
             compareRows = null
           }}
         />
@@ -494,7 +530,9 @@
     </section>
 
     <section
-      class="panel"
+      class="panel editor-container"
+      class:jse-theme-dark={darkMode}
+      class:dark-editor={darkMode}
       bind:this={rightHolder}
       aria-label="Right editor"
       on:dragover={handleDragOver}
@@ -572,7 +610,27 @@
     </div>
   {/if}
 
-  {#if modal?.kind === 'curl'}
+  {#if modal?.kind === 'about'}
+    <div class="modal-backdrop" role="presentation" on:click={(e) => { if (e.target === e.currentTarget) modal = null }}>
+      <div class="modal about-modal" role="dialog" aria-modal="true" aria-label="About JSON Editor">
+        <div class="about-logo">{`{ }`}</div>
+        <h2>JSON Editor</h2>
+        <p class="about-version">Version {appVersion}</p>
+        <div class="modal-body">
+          <p>A free, offline desktop app for viewing, editing, formatting, querying and comparing JSON.</p>
+          <p class="about-muted">
+            Open source under the MIT license. Editor powered by
+            <strong>svelte-jsoneditor</strong> by Jos de Jong (Apache-2.0).
+            This app is not affiliated with jsoneditoronline.org.
+          </p>
+        </div>
+        <div class="modal-actions">
+          <button class="appbtn primary" on:click={openGitHub}>GitHub Project</button>
+          <button class="appbtn" on:click={() => { modal = null }}>Close</button>
+        </div>
+      </div>
+    </div>
+  {:else if modal?.kind === 'curl'}
     <CurlModal target={modal.target} on:close={() => { modal = null }} on:apply={onCurlApply} />
   {:else if modal}
     <Modal
@@ -800,6 +858,60 @@
 
   :global(html.dark-mode) .statusbar .status-item.ok {
     color: #7ee2a0;
+  }
+
+  /* ---- dark mode for the editors themselves ---- */
+  /* jse-theme-dark class on the panel toggles all --jse-* variables (theme css
+     is imported in main.js). Class must be on an ancestor of the editor. */
+  :global(html.dark-mode) .editor-container {
+    background: #1e1e1e;
+  }
+
+  /* ---- about modal ---- */
+  .about-modal {
+    max-width: 420px;
+  }
+
+  .about-modal :global(.modal-body) {
+    text-align: left;
+  }
+
+  .about-logo {
+    width: 64px;
+    height: 64px;
+    margin: 8px auto 4px;
+    border-radius: 14px;
+    background: var(--je-accent);
+    color: #fff;
+    font-size: 22px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+  }
+
+  .about-version {
+    margin: 2px 0 10px;
+    color: var(--je-text-muted);
+    font-size: 12px;
+  }
+
+  .about-muted {
+    color: var(--je-text-muted);
+    font-size: 12px;
+    line-height: 1.5;
+    margin-top: 8px;
+  }
+
+  .appbtn.primary {
+    background: var(--je-accent);
+    border-color: var(--je-accent);
+    color: #fff;
+  }
+
+  .appbtn.primary:hover {
+    filter: brightness(1.08);
   }
 
   :global(html.dark-mode) .statusbar .status-item.bad {

@@ -1,6 +1,8 @@
 # JSON Editor Desktop
 
-An offline Electron desktop clone of [JSON Editor Online](https://jsoneditoronline.org/), built on the same open-source editor engine (svelte-jsoneditor) that powers the website.
+An offline Electron desktop app inspired by [JSON Editor Online](https://jsoneditoronline.org/), built on the same open-source editor engine ([svelte-jsoneditor](https://github.com/josdejong/svelte-jsoneditor)) that powers the website.
+
+Not affiliated with JSON Editor Online or Jos de Jong. The editor engine and JSON repair library this app builds on are his excellent open-source work, released under the Apache-2.0 license.
 
 Everything runs locally. No network access needed at runtime.
 

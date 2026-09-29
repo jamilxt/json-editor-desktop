@@ -19,9 +19,6 @@ linux:
     - AppImage
     - deb
   category: Development
-  desktop:
-    Name: JSON Editor
-    Comment: View, edit, format, query and compare JSON files, fully offline
 win:
   target:
     - target: portable

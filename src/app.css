@@ -1,0 +1,179 @@
+:root {
+  --je-topbar-bg: #ffffff;
+  --je-topbar-border: #d7dbe0;
+  --je-bg: #f5f6f8;
+  --je-divider: #d7dbe0;
+  --je-accent: #3883fa;
+  --je-text: #1f2933;
+  --je-text-muted: #6b7280;
+  --je-btn-bg: #ffffff;
+  --je-btn-border: #cdd3da;
+  --je-btn-hover: #f0f3f6;
+  --je-panel-bg: #ffffff;
+}
+
+html.dark-mode {
+  --je-topbar-bg: #1c2127;
+  --je-topbar-border: #2d333b;
+  --je-bg: #14181d;
+  --je-divider: #2d333b;
+  --je-accent: #6cb2fc;
+  --je-text: #e6eaef;
+  --je-text-muted: #8b949e;
+  --je-btn-bg: #22272e;
+  --je-btn-border: #3a424b;
+  --je-btn-hover: #2d333b;
+  --je-panel-bg: #1c2127;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: -apple-system, 'Segoe UI', Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  color: var(--je-text);
+  background: var(--je-bg);
+}
+
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+button.appbtn {
+  background: var(--je-btn-bg);
+  color: var(--je-text);
+  border: 1px solid var(--je-btn-border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+button.appbtn:hover {
+  background: var(--je-btn-hover);
+}
+
+button.appbtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* full-height svelte-jsoneditor container */
+.jse-main {
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: var(--je-panel-bg);
+  color: var(--je-text);
+  border-radius: 10px;
+  border: 1px solid var(--je-divider);
+  padding: 20px;
+  min-width: 520px;
+  max-width: 80vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal h2 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+}
+
+.modal .modal-body {
+  overflow: auto;
+  flex: 1;
+}
+
+.modal .modal-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.modal textarea,
+.modal input[type='text'] {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--je-bg);
+  color: var(--je-text);
+  border: 1px solid var(--je-btn-border);
+  border-radius: 6px;
+  padding: 8px;
+  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+
+.modal select {
+  background: var(--je-bg);
+  color: var(--je-text);
+  border: 1px solid var(--je-btn-border);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.modal .preview {
+  background: var(--je-bg);
+  border: 1px solid var(--je-btn-border);
+  border-radius: 6px;
+  padding: 8px;
+  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 200px;
+  overflow: auto;
+}
+
+.diff-row {
+  display: flex;
+  gap: 16px;
+}
+
+.diff-col {
+  flex: 1;
+  min-height: 340px;
+  height: 60vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.diff-col h3 {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+}
+
+.statusbar {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: var(--je-text-muted);
+  border-top: 1px solid var(--je-divider);
+  background: var(--je-topbar-bg);
+}
+
+.statusbar .status-item {
+  white-space: nowrap;
+}

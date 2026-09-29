@@ -4,6 +4,10 @@
   "version": "1.0.0",
   "description": "Offline desktop clone of JSON Editor Online (jsoneditoronline.org) built with Electron and svelte-jsoneditor",
   "main": "main.cjs",
+  "author": {
+    "name": "Jamilur Rahman",
+    "email": "jamilxt@users.noreply.github.com"
+  },
   "private": true,
   "license": "MIT",
   "scripts": {

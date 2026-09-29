@@ -32,7 +32,13 @@ Go to the [Releases page](https://github.com/jamilxt/json-editor-desktop/release
 | Windows | `JSON.Editor.1.0.0.exe` |
 | Linux | `JSON.Editor-1.0.0.AppImage` or `json-editor-desktop_1.0.0_amd64.deb` |
 
-**macOS first run:** if macOS says the app cannot be opened because it is from an unknown developer, right-click the app and choose Open, then click Open again. You only need to do this once. The app is not code-signed yet.
+**macOS first run:** the app is not code-signed with an Apple Developer certificate, so macOS may block it. If you see "JSON Editor.app is damaged and can't be opened", do NOT delete it. Open Terminal and run:
+
+```bash
+sudo xattr -rd com.apple.quarantine /Applications/JSON\ Editor.app
+```
+
+Then open the app normally. You only need to do this once. (The file is not actually damaged. macOS adds a "quarantine" marker to downloaded files, and unsigned apps with that marker are refused on Apple Silicon Macs.)
 
 ## How to use it
 

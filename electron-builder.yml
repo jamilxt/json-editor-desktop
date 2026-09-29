@@ -13,7 +13,12 @@ mac:
   target:
     - target: dmg
       arch: [arm64, x64]
-  identity: null
+  # No Apple Developer cert. Do NOT set identity: null here: that disables
+  # signing completely and arm64 macOS then refuses to run the app with a
+  # "damaged and can't be opened" error. With this option left unset,
+  # electron-builder falls back to ad-hoc signing, which arm64 macOS accepts.
+  # Users still clear the quarantine flag once (see README) because the app
+  # is not Developer-ID signed and not notarized.
 linux:
   target:
     - AppImage

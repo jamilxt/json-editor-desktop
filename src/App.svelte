@@ -5,6 +5,7 @@
   import Ajv from 'ajv'
   import Modal from './Modal.svelte'
   import CurlModal from './CurlModal.svelte'
+  import PathNavigator from './PathNavigator.svelte'
   import { deepDiff } from './lib/diff.js'
   import { parseCsv, rowsToObjects, jsonToCsv, detectDelimiter } from './lib/csv.js'
   import { formatBytes, isValidJsonText, contentToText } from './lib/utils.js'
@@ -13,6 +14,8 @@
 
   let leftHolder
   let rightHolder
+  let leftEditor // svelte-jsoneditor component ref: scrollTo/expand methods
+  let rightEditor
   let leftContent = { json: sampleJson() }
   let rightContent = { text: '' }
   let leftMode = 'tree'
@@ -281,6 +284,25 @@
     modal = { kind: 'curl', target: 'left' }
   }
 
+  /* ---------- path navigator ---------- */
+
+  async function navigateTo (side, path) {
+    const editor = side === 'left' ? leftEditor : rightEditor
+    const content = side === 'left' ? leftContent : rightContent
+    if (!editor || !path.length) return
+    if (!isValidJsonText(contentToText(content))) {
+      status('Document is not valid JSON')
+      return
+    }
+    try {
+      editor.expand(path)
+      await editor.scrollTo(path)
+      status('Jumped to ' + (side === 'left' ? 'left' : 'right') + ' panel: ' + path.join('.'))
+    } catch (e) {
+      status('Could not jump: ' + (e.message || e))
+    }
+  }
+
   function onCurlApply (e) {
     const { content, side } = e.detail
     if (side === 'right') {
@@ -384,6 +406,8 @@
   $: rightText = contentToText(rightContent)
   $: rightBytes = new TextEncoder().encode(rightText).length
   $: rightValid = isValidJsonText(rightText)
+  $: leftParsed = leftValid ? tryParse(leftContent).value : null
+  $: rightParsed = rightValid ? tryParse(rightContent).value : null
 
   /* ---------- keyboard shortcuts ---------- */
 
@@ -451,7 +475,11 @@
         </div>
       </div>
       <div class="editor-holder">
+        {#if leftMode === 'tree'}
+          <PathNavigator json={leftParsed} label="Go to" on:navigate={(e) => navigateTo('left', e.detail.path)} />
+        {/if}
         <JSONEditor
+          bind:this={leftEditor}
           content={leftContent}
           mode={leftMode}
           mainMenuBar={true}
@@ -492,7 +520,11 @@
         </div>
       </div>
       <div class="editor-holder">
+        {#if rightMode === 'tree'}
+          <PathNavigator json={rightParsed} label="Go to" on:navigate={(e) => navigateTo('right', e.detail.path)} />
+        {/if}
         <JSONEditor
+          bind:this={rightEditor}
           content={rightContent}
           mode={rightMode}
           mainMenuBar={true}

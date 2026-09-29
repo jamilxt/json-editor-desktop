@@ -27,10 +27,10 @@ Go to the [Releases page](https://github.com/jamilxt/json-editor-desktop/release
 
 | System | File |
 | --- | --- |
-| macOS (Apple Silicon) | `JSON.Editor-1.0.0-arm64.dmg` |
-| macOS (Intel) | `JSON.Editor-1.0.0-x64.dmg` |
-| Windows | `JSON Editor Setup 1.0.0.exe` |
-| Linux | `json-editor-1.0.0.AppImage` or `json-editor_1.0.0_amd64.deb` |
+| macOS (Apple Silicon, M1/M2/M3/M4/M5) | `JSON.Editor-1.0.0-arm64.dmg` |
+| macOS (Intel) | `JSON.Editor-1.0.0.dmg` |
+| Windows | `JSON.Editor.1.0.0.exe` |
+| Linux | `JSON.Editor-1.0.0.AppImage` or `json-editor-desktop_1.0.0_amd64.deb` |
 
 **macOS first run:** if macOS says the app cannot be opened because it is from an unknown developer, right-click the app and choose Open, then click Open again. You only need to do this once. The app is not code-signed yet.
 

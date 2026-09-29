@@ -4,33 +4,36 @@ A free, offline desktop app for working with JSON files. Works on macOS, Linux, 
 
 ![JSON Editor screenshot](docs/screenshot-main.png)
 
+| | |
+| --- | --- |
+| ![Curl executor](docs/screenshot-curl.png) | ![About dialog](docs/screenshot-about.png) |
+| **Curl executor** - run an API call, inspect the response | **About** - version, license, project links |
+
 ## What can it do?
 
-- **Edit JSON easily.** Switch between three views any time: a clickable tree, plain text, and a spreadsheet-like table.
-- **Format and fix broken JSON.** Paste messy JSON and the app repairs it automatically when it can (missing quotes, trailing commas, single quotes, and similar problems).
-- **Query your data.** Open the Transform modal and filter or reshape your JSON using JavaScript, lodash, JMESPath, or jq. You see a preview before anything changes.
-- **Run curl commands.** Paste any curl command, run it, and load the response straight into a panel. Great for testing APIs.
+- **Edit JSON easily** in three views: a clickable tree view, plain text, and a spreadsheet-style table view.
+- **Two panels side by side**, so you can keep two documents open, copy between them, and compare them.
+- **Transform** the document with a query: JavaScript expressions, lodash, JMESPath, or jq. For example, keep only the items you care about, or pull one value out of a big file.
+- **Path navigator ("Go to")**: jump straight to any nested item from dropdowns, with previews. Great for finding the last item of a large API response without scrolling.
+- **Curl executor**: paste a curl command, run it, and load the JSON response straight into a panel.
+- **Compare** two documents and see every difference: added, removed, or changed values.
+- **Validate** a document against a JSON Schema and see exactly which lines break the rules.
+- **Repair** broken JSON (missing quotes, trailing commas, JavaScript-style objects) with one click.
+- **CSV export**: turn a JSON array into a CSV file.
+- **Dark mode**, remembered between sessions.
 
-![Curl executor screenshot](docs/screenshot-curl.png)
-
-- **Compare two files.** Open one file on the left and another on the right, click Compare, and see every difference: what was added, removed, or changed.
-- **Check against a JSON Schema.** Paste a schema and the status bar shows whether your document matches it.
-- **Convert to and from CSV.** Drop a .csv file to convert it to JSON, or export your JSON as CSV.
-- **Work with big files.** The tree view loads large documents without freezing.
-- **Dark mode.** One click to switch, and the app remembers your choice.
-
-Everything runs on your computer. The app never sends your data anywhere and does not need an internet connection.
+Everything runs locally. No account, no internet connection needed (the curl feature is the only thing that uses the network, and only when you run a command).
 
 ## Download
 
-Go to the [Releases page](https://github.com/jamilxt/json-editor-desktop/releases/latest) and download the file for your system:
+Grab the latest installer from the [Releases page](https://github.com/jamilxt/json-editor-desktop/releases/latest):
 
 | System | File |
 | --- | --- |
-| macOS (Apple Silicon, M1/M2/M3/M4/M5) | `JSON.Editor-1.0.0-arm64.dmg` |
-| macOS (Intel) | `JSON.Editor-1.0.0.dmg` |
-| Windows | `JSON.Editor.1.0.0.exe` |
-| Linux | `JSON.Editor-1.0.0.AppImage` or `json-editor-desktop_1.0.0_amd64.deb` |
+| macOS (Apple Silicon, M1/M2/M3/M4/M5) | `JSON.Editor-<version>-arm64.dmg` |
+| macOS (Intel) | `JSON.Editor-<version>.dmg` |
+| Windows | `JSON.Editor.<version>.exe` |
+| Linux | `JSON.Editor-<version>.AppImage` or `.deb` |
 
 **macOS first run:** the app is not code-signed with an Apple Developer certificate, so macOS may block it. If you see "JSON Editor.app is damaged and can't be opened", do NOT delete it. Open Terminal and run:
 
@@ -38,21 +41,32 @@ Go to the [Releases page](https://github.com/jamilxt/json-editor-desktop/release
 sudo xattr -rd com.apple.quarantine /Applications/JSON\ Editor.app
 ```
 
-Then open the app normally. You only need to do this once. (The file is not actually damaged. macOS adds a "quarantine" marker to downloaded files, and unsigned apps with that marker are refused on Apple Silicon Macs.)
+Then open the app normally. You only need to do this once.
 
 ## How to use it
 
-1. **Open a file:** click Open, or just drag a file from Finder/Explorer onto either panel.
-2. **Switch views:** use the Tree, Text, and Table buttons at the top of each panel.
-3. **Format your JSON:** the tree and table views always show clean, formatted JSON. To save it formatted, click Copy formatted, then paste it anywhere.
-4. **Run a query:** click Transform, pick a language, type your query, click Preview, then Apply. Example: `json.services.filter(s => !s.healthy)` shows all unhealthy services.
-5. **Run a curl command:** click Curl, paste your command, press Ctrl+Enter (or Cmd+Enter on Mac), then choose which panel receives the response.
-6. **Compare files:** open file A on the left and file B on the right, then click Compare.
-7. **Save:** click Save. The app offers to repair first if the document is invalid.
+1. Open a JSON file with the **Open** button, or drag a file onto the window, or just paste JSON text.
+2. Switch between **Tree**, **Text**, and **Table** views with the tabs at the top of each panel.
+3. Edit in any view. The other views update instantly.
+4. Use **Transform** to filter or reshape the document with a query.
+5. Use **Go to** to jump to a deep property: pick a key or an array index from the dropdowns, then press Go. The editor scrolls there and expands it.
+6. Paste a curl command into the **Curl** dialog to fetch a live API response into either panel.
+7. Press **Compare** to diff the left and right documents.
+8. Save with **Ctrl/Cmd+S**, or **Export CSV** to get a spreadsheet file.
 
-**Keyboard shortcuts:** Ctrl/Cmd+O opens a file, Ctrl/Cmd+S saves, Ctrl/Cmd+D toggles dark mode, Ctrl/Cmd+Enter runs a curl command.
+## Keyboard shortcuts
 
-## Run from source
+| Shortcut | Action |
+| --- | --- |
+| Ctrl/Cmd+O | Open file |
+| Ctrl/Cmd+S | Save left document |
+| Ctrl/Cmd+D | Toggle dark mode |
+
+## About this project
+
+This app is open source under the [MIT license](LICENSE). It is built on the excellent [svelte-jsoneditor](https://github.com/josdejong/svelte-jsoneditor) library by Jos de Jong (Apache-2.0), the same engine that powers jsoneditoronline.org. This project is not affiliated with jsoneditoronline.org.
+
+## Build it yourself
 
 You need Node.js 18 or newer.
 
@@ -64,21 +78,22 @@ npm run build
 npm start
 ```
 
-If `npm start` fails with "Electron failed to install correctly", your npm skipped the download step. Run `npm config get ignore-scripts`. If it prints `true`, run `npm config set ignore-scripts false`, delete the `node_modules` folder, and run `npm install` again. Slow networks can also cause it; retrying the install usually fixes it.
+To package installers for all platforms, push a tag like `v1.2.0` and GitHub Actions builds them automatically (see `.github/workflows/release.yml`).
 
-## Build an installer
+## Troubleshooting
+
+**"Electron failed to install correctly" when running `npm start`:** the Electron binary download was skipped or interrupted. Fix:
 
 ```bash
-npm run build
-npx electron-builder --config electron-builder.yml
+rm -rf node_modules/electron
+npm install electron
 ```
 
-The installer appears in the `release/` folder. To build for all three systems at once, push a tag like `v1.0.1` and GitHub Actions builds them for you (see `.github/workflows/release.yml`).
+If your network blocks the download, use a mirror:
 
-## Credits and license
+```bash
+rm -rf node_modules/electron
+ELECTRON_MIRROR="https://npmmirror.com/mirrors/electron/" npm install electron
+```
 
-Built with [svelte-jsoneditor](https://github.com/josdejong/svelte-jsoneditor), [jsonrepair](https://github.com/josdejong/jsonrepair), and [ajv](https://github.com/ajv-validator/ajv) by Jos de Jong and contributors, plus [jq-wasm](https://github.com/owickstrom/gmahi) for real jq support.
-
-This project is not affiliated with JSON Editor Online (jsoneditoronline.org) or Jos de Jong.
-
-Licensed under the [MIT License](LICENSE).
+**Paste does not work in a text field on macOS:** update to the latest version. Older builds missed the Edit menu roles that macOS requires for clipboard shortcuts.

@@ -4,6 +4,7 @@
   import { jsonrepair } from 'jsonrepair'
   import Ajv from 'ajv'
   import Modal from './Modal.svelte'
+  import CurlModal from './CurlModal.svelte'
   import { deepDiff } from './lib/diff.js'
   import { parseCsv, rowsToObjects, jsonToCsv, detectDelimiter } from './lib/csv.js'
   import { formatBytes, isValidJsonText, contentToText } from './lib/utils.js'
@@ -24,7 +25,7 @@
   /* ---------- app state ---------- */
 
   let darkMode = false
-  let modal = null // null | { kind: 'transform' | 'schema', target: 'left' | 'right' }
+  let modal = null // null | { kind: 'transform' | 'schema' | 'curl', target: 'left' | 'right' }
   let compareRows = null // null | array of diffs
   let recentFiles = []
   let statusMsg = ''
@@ -276,6 +277,24 @@
     modal = { kind: 'schema', target: side }
   }
 
+  function openCurl () {
+    modal = { kind: 'curl', target: 'left' }
+  }
+
+  function onCurlApply (e) {
+    const { content, side } = e.detail
+    if (side === 'right') {
+      rightContent = content
+      rightFilePath = null
+    } else {
+      leftContent = content
+      leftFilePath = null
+    }
+    compareRows = null
+    modal = null
+    status('Response placed in ' + side + ' panel')
+  }
+
   function onModalApply (e) {
     const json = e.detail.json
     if (modal?.target === 'right') {
@@ -397,6 +416,7 @@
     <span class="toolbar-sep"></span>
     <button class="appbtn" title="Query and transform the left document" on:click={() => openTransform('left')}>Transform</button>
     <button class="appbtn" title="Validate left document against a JSON Schema" on:click={() => openSchema('left')}>Schema</button>
+    <button class="appbtn" title="Run a curl command and load the response into a panel" on:click={openCurl}>Curl</button>
     <span class="toolbar-sep"></span>
     <button class="appbtn" title="Compare left and right documents" on:click={runCompare}>Compare</button>
     <span class="spacer"></span>
@@ -520,7 +540,9 @@
     </div>
   {/if}
 
-  {#if modal}
+  {#if modal?.kind === 'curl'}
+    <CurlModal target={modal.target} on:close={() => { modal = null }} on:apply={onCurlApply} />
+  {:else if modal}
     <Modal
       mode={modal.kind}
       leftText={modal.target === 'right' ? rightText : leftText}

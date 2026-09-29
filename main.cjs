@@ -125,12 +125,48 @@ function registerIpc () {
 function buildMenu () {
   const send = (ch, ...args) => () => { if (win) win.webContents.send(ch, ...args) }
 
+  // NOTE: the Edit menu with role entries is REQUIRED on macOS: without it,
+  // Cmd+C/Cmd+V/Cmd+A do not work in any text input (Electron routes clipboard
+  // shortcuts through the menu on darwin).
   const template = [
     ...(isMac ? [{ role: 'appMenu' }] : []),
     {
       label: 'File',
       submenu: [
         { label: 'Open File...', accelerator: 'CmdOrCtrl+O', click: send('menu', 'open-file') }
+      ]
+    },
+    {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        { role: 'selectAll' }
+      ]
+    },
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'toggleDevTools' },
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' }
+      ]
+    },
+    {
+      label: 'Window',
+      submenu: [
+        { role: 'minimize' },
+        { role: 'zoom' },
+        ...(isMac ? [{ type: 'separator' }, { role: 'front' }] : [{ type: 'separator' }, { role: 'close' }])
       ]
     }
   ]

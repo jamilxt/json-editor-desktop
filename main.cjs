@@ -26,6 +26,30 @@ function createWindow () {
   win.loadFile(path.join(__dirname, 'dist', 'index.html'))
   win.once('ready-to-show', () => win.show())
   win.on('closed', () => { win = null })
+
+  // Unsaved-changes guard: renderer tracks dirty state, asks before closing.
+  let rendererClean = true
+  ipcMain.on('dirty-state', (evt, dirty) => { rendererClean = !dirty })
+  win.on('close', (e) => {
+    if (rendererClean) return
+    const choice = dialog.showMessageBoxSync(win, {
+      type: 'warning',
+      buttons: ['Save', 'Discard Changes', 'Cancel'],
+      defaultId: 0,
+      cancelId: 2,
+      message: 'You have unsaved changes.',
+      detail: 'Do you want to save them before closing?'
+    })
+    if (choice === 2) {
+      e.preventDefault()
+      return
+    }
+    if (choice === 0) {
+      // let the renderer run its save flow, then close
+      e.preventDefault()
+      win.webContents.send('menu', 'save-and-quit')
+    }
+  })
 }
 
 /* ---------------- file dialog helpers ---------------- */
@@ -120,6 +144,17 @@ function registerIpc () {
     win.isMaximized() ? win.unmaximize() : win.maximize()
   })
   ipcMain.handle('window:close', () => win && win.close())
+  ipcMain.handle('shell:openExternal', (evt, url) => {
+    if (typeof url === 'string' && /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+$/.test(url)) {
+      return shell.openExternal(url)
+    }
+    return false
+  })
+  ipcMain.handle('app:info', () => ({
+    version: app.getVersion(),
+    electron: process.versions.electron,
+    platform: process.platform
+  }))
 }
 
 function buildMenu () {
@@ -167,6 +202,21 @@ function buildMenu () {
         { role: 'minimize' },
         { role: 'zoom' },
         ...(isMac ? [{ type: 'separator' }, { role: 'front' }] : [{ type: 'separator' }, { role: 'close' }])
+      ]
+    },
+    {
+      label: 'Help',
+      submenu: [
+        {
+          label: 'About JSON Editor',
+          click: send('menu', 'about')
+        },
+        {
+          label: 'GitHub Project',
+          click: () => { shell.openExternal('https://github.com/jamilxt/json-editor-desktop') }
+        },
+        { type: 'separator' },
+        { role: 'learnMore', label: 'Electron Documentation' }
       ]
     }
   ]

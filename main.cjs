@@ -53,7 +53,7 @@ function askSave (evt, { content = '', defaultPath = 'untitled.json' } = {}) {
   const r = dialog.showSaveDialogSync(win, {
     title: 'Save file',
     defaultPath,
-    filters: fileFilters(defaultPath.toLowerCase().endsWith('.csv') ? 'rubbish' : undefined)
+    filters: fileFilters(defaultPath.toLowerCase().endsWith('.csv') ? 'csv' : undefined)
   })
   if (!r) return null
   fs.writeFileSync(r, content, 'utf8')

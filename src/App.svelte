@@ -39,9 +39,14 @@
 
   function sampleJson () {
     return {
-      name: 'JSON Editor Desktop',
-      offline: true,
-      features: ['tree', 'text', 'table', 'transform', 'compare', 'repair', 'csv', 'schema']
+      status: true,
+      errorCode: null,
+      last_update: 'Tue Sep 29 11:15:35 BDT 2026',
+      campaignList: [
+        { retailer_name: 'Annajaf Telecom', retailer_code: 'BD20008376', retailer_msisdn: '01746661010', retailer_id: '447' },
+        { retailer_name: 'Dhaka Mobile Point', retailer_code: 'BD20008377', retailer_msisdn: '01711111111', retailer_id: '448' },
+        { retailer_name: 'Mirpur Telecom', retailer_code: 'BD20008378', retailer_msisdn: '01722222222', retailer_id: '449' }
+      ]
     }
   }
 

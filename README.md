@@ -9,6 +9,18 @@ A free, offline desktop app for working with JSON files. Works on macOS, Linux, 
 | ![Curl executor](docs/screenshot-curl.png) | ![About dialog](docs/screenshot-about.png) |
 | **Curl executor** - run an API call, inspect the response | **About** - version, license, project links |
 
+## Why does this app exist?
+
+Because your JSON should never leave your machine.
+
+In late 2025, security researchers at watchTowr Labs revealed that popular online JSON tools (jsonformatter.org and codebeautify.org) had [leaked over 80,000 files](https://m.watchtowr.com/five-years-of-jsonformatter-codebeautify-leaks-expose-thousands-of-passwords-cloud-keys-and-more/) containing usernames, passwords, AWS/GCP/Azure keys, database credentials, SSH session logs, and CI/CD secrets. People pasted real production data into a "handy formatter" website, hit Save, and the site published it at a predictable public URL. The exposure spanned five years and touched banks, telecoms, healthcare systems, and government agencies.
+
+The risk is not the tool being malicious. It is the workflow: paste sensitive JSON into a website you do not control, and you have shipped it.
+
+**JSON Editor takes the website out of the equation.** It is a desktop app. Your documents stay in local files and local memory. There is no account, no upload button, no server, no saved-links page. The only network call the app can ever make is a curl command that you write and run yourself.
+
+If you format API responses with tokens in them, inspect config files with connection strings, or debug payloads with customer data, this is the safer default.
+
 ## What can it do?
 
 - **Edit JSON easily** in three views: a clickable tree view, plain text, and a spreadsheet-style table view.

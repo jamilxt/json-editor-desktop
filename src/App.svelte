@@ -490,25 +490,6 @@
       on:dragover={handleDragOver}
       on:drop={(e) => handleDrop('left', e)}
     >
-      <div class="panel-header">
-        <span class="panel-name" title={leftFilePath || 'untitled'}>
-          {leftFilePath ? leftFilePath.split(/[\\/]/).pop() : 'untitled'}
-        </span>
-        <div class="mode-switch" role="group" aria-label="Left panel mode">
-          {#each ['tree', 'text', 'table'] as m}
-            <button
-              class="mode-btn"
-              class:active={leftMode === m}
-              on:click={() => { leftMode = m }}
-            >{m}</button>
-          {/each}
-        </div>
-        <div class="panel-actions">
-          <button class="appbtn small" title="Open file in left panel" on:click={() => openInto('left')}>Open</button>
-          <button class="appbtn small" title="Save left document" on:click={() => saveSide('left')}>Save</button>
-          <button class="appbtn small" title="Copy left document to the right panel" on:click={copyFromLeftToRight}>To right</button>
-        </div>
-      </div>
       <div class="editor-holder">
         {#if leftMode === 'tree'}
           <PathNavigator json={leftParsed} label="Go to" on:navigate={(e) => navigateTo('left', e.detail.path)} />
@@ -529,6 +510,23 @@
       </div>
     </section>
 
+    <div class="center-col" role="group" aria-label="Panel actions">
+      <div class="center-group">
+        <div class="center-label">Copy</div>
+        <button class="center-btn" title="Copy left document to the right panel" on:click={copyFromLeftToRight}>&rsaquo;</button>
+        <button class="center-btn" title="Copy right document to the left panel" on:click={copyFromRightToLeft}>&lsaquo;</button>
+      </div>
+      <div class="center-group">
+        <div class="center-label">Transform</div>
+        <button class="center-btn" title="Transform the left document" on:click={() => openTransform('left')}>&rsaquo;</button>
+        <button class="center-btn" title="Transform the right document" on:click={() => openTransform('right')}>&lsaquo;</button>
+      </div>
+      <div class="center-group">
+        <div class="center-label">Differences</div>
+        <button class="center-btn wide" title="Compare left and right documents" on:click={runCompare}>Compare</button>
+      </div>
+    </div>
+
     <section
       class="panel editor-container"
       class:jse-theme-dark={darkMode}
@@ -538,25 +536,6 @@
       on:dragover={handleDragOver}
       on:drop={(e) => handleDrop('right', e)}
     >
-      <div class="panel-header">
-        <span class="panel-name" title={rightFilePath || 'empty'}>
-          {rightFilePath ? rightFilePath.split(/[\\/]/).pop() : '(right, for compare)'}
-        </span>
-        <div class="mode-switch" role="group" aria-label="Right panel mode">
-          {#each ['tree', 'text', 'table'] as m}
-            <button
-              class="mode-btn"
-              class:active={rightMode === m}
-              on:click={() => { rightMode = m }}
-            >{m}</button>
-          {/each}
-        </div>
-        <div class="panel-actions">
-          <button class="appbtn small" title="Open file in right panel" on:click={() => openInto('right')}>Open</button>
-          <button class="appbtn small" title="Save right document" on:click={() => saveSide('right')}>Save</button>
-          <button class="appbtn small" title="Copy right document to the left panel" on:click={copyFromRightToLeft}>To left</button>
-        </div>
-      </div>
       <div class="editor-holder">
         {#if rightMode === 'tree'}
           <PathNavigator json={rightParsed} label="Go to" on:navigate={(e) => navigateTo('right', e.detail.path)} />
@@ -703,6 +682,59 @@
     min-height: 0;
   }
 
+  /* center column between panels (jsoneditoronline-style) */
+  .center-col {
+    flex: 0 0 76px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 18px;
+    padding: 14px 6px;
+    border-left: 1px solid var(--je-divider);
+    border-right: 1px solid var(--je-divider);
+    background: var(--je-topbar-bg);
+  }
+
+  .center-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .center-label {
+    font-size: 11px;
+    color: var(--je-text-muted);
+    margin-bottom: 2px;
+  }
+
+  .center-btn {
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--je-btn-border);
+    background: var(--je-btn-bg);
+    color: var(--je-text);
+    border-radius: 6px;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .center-btn:hover {
+    background: var(--je-btn-hover);
+  }
+
+  .center-btn.wide {
+    width: auto;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  :global(html.dark-mode) .center-col {
+    border-color: var(--je-divider);
+  }
+
   .panel {
     flex: 1 1 0%;
     display: flex;
@@ -717,57 +749,12 @@
     border-right: none;
   }
 
-  .panel-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 5px 10px;
-    border-bottom: 1px solid var(--je-divider);
-    background: var(--je-topbar-bg);
-    flex: 0 0 auto;
-    overflow: hidden;
-  }
 
-  .panel-name {
-    font-size: 12px;
-    font-weight: 600;
-    max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
 
-  .mode-switch {
-    display: flex;
-    gap: 2px;
-  }
 
-  .mode-btn {
-    background: transparent;
-    border: 1px solid transparent;
-    color: var(--je-text-muted);
-    border-radius: 5px;
-    padding: 2px 10px;
-    font-size: 12px;
-    cursor: pointer;
-    text-transform: capitalize;
-  }
 
-  .mode-btn:hover {
-    background: var(--je-btn-hover);
-  }
 
-  .mode-btn.active {
-    background: var(--je-btn-bg);
-    border-color: var(--je-btn-border);
-    color: var(--je-text);
-  }
 
-  .panel-actions {
-    margin-left: auto;
-    display: flex;
-    gap: 6px;
-  }
 
   .appbtn.small {
     padding: 3px 8px;
